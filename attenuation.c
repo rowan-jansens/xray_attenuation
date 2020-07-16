@@ -12,23 +12,23 @@ int photons[125][4];
 //Data table with values for calculating atmopsheric density
 //https://en.wikipedia.org/wiki/Barometric_formula
 //layer height(m), layer density(kg/m3), layer temp(k), layer lapse-rate(k/m)
-double atmosphere[7][4] = {
+double atmosphere[8][4] = {
   {0.000, 1.225000, 288.15, -0.0065},
   {11000, 0.363910, 216.65, 0.00000},
   {20000, 0.088030, 216.65, 0.00100},
   {32000, 0.013220, 228.65, 0.00280},
   {47000, 0.001430, 270.65, 0.00000},
   {51000, 0.000860, 270.65, -0.0028},
-  {71000, 0.000064, 214.65, -0.0020}
+  {71000, 0.000064, 214.65, -0.0020},
+  {100000, 0, 1, -1}  //0 density layer makes computation faster
 };
 
 double density(double height){
   //determine atmosphere layer (0-6) to sorce atmospheric data
   int layer = 0;
-  while (height > atmosphere[layer+1][0] && layer < 7){
+  while (height >= atmosphere[layer+1][0] && layer < 7){
     layer++;
   }
-
   //source values from "atmosphere" datatable depending on layer
   double density, l_height, l_den, l_temp, l_lapse, base, exponent;
   l_height = atmosphere[layer][0];
@@ -54,14 +54,20 @@ double density(double height){
 
 //integrate the density function (^above^) using trapezoidal riemann sums
 //and divide to come up with average density for a particlar interval
+//If the altitude is over 100 km, then return 0.
 double average_density(double height){
   double i;
   double area = 0;
-  double step = 0.25;  //decreasing this number will increase run time and accuracy
-  for (i=height; i<(height+interval); i+=step){
-    area += ((density(i) + density(i + step)) / 2) * step;
+  double step = 0.25; //decreasing this number will increase run time and accuracy
+  if(height < 100000){
+    for (i=height; i<(height+interval); i+=step){
+      area += ((density(i) + density(i + step)) / 2) * step;
+    }
+    return area / interval;
   }
-  return area / interval;
+  else{
+    return 0;
+  }
 }
 
 //make a matrix of different photon energies (1-125 keV)
@@ -107,7 +113,8 @@ int main(){
 
   printf("Enter Detonation Altitude (meters above MSL [0m-100000m]): ");
   scanf("%lf", &start_height);
-  
+
+
   FILE * f = fopen("att.dat", "w");
   int h, i, j;
   make_photons(start_height);
@@ -122,5 +129,6 @@ int main(){
   }
 
   fclose(f);
+
   return 0;
 }
