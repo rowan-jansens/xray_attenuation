@@ -1,3 +1,7 @@
+/*x-ray attenuation through the atmosphere
+Coded by: Rowan Jansens
+*/ 
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
@@ -19,7 +23,7 @@ double atmosphere[7][4] = {
 };
 
 double density(double height){
-  //determine what layer in the atmosphere (from the table) we are in
+  //determine atmosphere layer (0-6) to sorce atmospheric data
   int layer = 0;
   while (height > atmosphere[layer+1][0] && layer < 7){
     layer++;
@@ -48,12 +52,12 @@ double density(double height){
   }
 }
 
-//integrate the density function (above) and divide to come up with
-//average density for a particlar interval
+//integrate the density function (^above^) using trapezoidal riemann sums
+//and divide to come up with average density for a particlar interval
 double average_density(double height){
   double i;
   double area = 0;
-  double step = 0.5;
+  double step = 0.25;  //decreasing this number will increase run time and accuracy
   for (i=height; i<(height+interval); i+=step){
     area += ((density(i) + density(i + step)) / 2) * step;
   }
@@ -61,26 +65,20 @@ double average_density(double height){
 }
 
 //make a matrix of different photon energies (1-125 keV)
-//give each energy 1 mil initial photons
+//give each energy some photons acording to an arbitrary exponential decay function
 int make_photons(double start_height){
   int i;
   for (i=0; i<125; i++){
     int energy = (i+1);
     photons[i][0] = energy;
-    photons[i][1] = start_height;
-    photons[i][2] = 1000 * pow(1-0.01, energy);
-  }
-}
-
-//print the photon matrix to a file
-int print_photons(){
-  int i;
-  for (i=0; i<125; i+=1){
-    printf("%d %d %d\n", photons[i][0], photons[i][1], photons[i][2]);  
+    photons[i][1] = start_height;  //i.e. the altitude of detonation
+    photons[i][2] = 1000 * pow(1-0.01, energy);  //decay function
   }
 }
 
 //calculate attenuation coeffiect for a group of photons of a certain energy
+//equation comes from a gnuplot fit of NIST attenuation data
+//https://physics.nist.gov/PhysRefData/XrayMassCoef/ComTab/air.html
 double get_attcoe(double energy){
   double attcoe = 393.444 / (pow(energy, 2.87995) + 0.0911984) + 0.0417973;
   return attcoe;
@@ -91,7 +89,7 @@ double get_attcoe(double energy){
 //from density, attenuation coeffiect, and the size of the interval
 double photons_prime(double height){
   int i;
-  for (i=0; i<125; i++){
+  for (i=0; i<125; i++){  //loop through all energies
     int e = photons[i][0];
     double percent = exp(-1 * get_attcoe(e) * average_density(height) * interval);
     photons[i][1] = height + interval;  //update the "iteration-number" column in the matrix
@@ -100,18 +98,29 @@ double photons_prime(double height){
 }
 
 int main(){
+  
+  double start_height;   //altitude of detonation
+  interval = 2000;  //how often the matrix will be sampled/updated
+  //changing the interval should have no major effect on the final results
+  //becuase the calculations are always made using a continuous density function
+  //which is averaged out over the interval
+
+  printf("Enter Detonation Altitude (meters above MSL [0m-100000m]): ");
+  scanf("%lf", &start_height);
+  
   FILE * f = fopen("att.dat", "w");
   int h, i, j;
-  double start_height = 40000;
-  interval = 1000;
   make_photons(start_height);
-  for(h=start_height; h<100000; h+=interval){
-    for (i=0; i<125; i+=5){
-      fprintf(f, "%d %d %d\n", photons[i][0], photons[i][1], photons[i][2]);  
+  
+  for(h=start_height; h<=100000; h+=interval){   //increment the altitude
+    for (i=0; i<125; i+=5){   //loop through some of the energies
+      //increasing the incriment will increase run time
+      fprintf(f, "%d %d %d\n", photons[i][0], photons[i][1], photons[i][2]);  //save matrix to file
   }
     fprintf(f, "\n");
-    photons_prime(h);
+    photons_prime(h);  //update matrix
   }
+
   fclose(f);
   return 0;
 }
