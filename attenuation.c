@@ -5,6 +5,7 @@ Coded by: Rowan Jansens
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include <time.h>
 
 int photons[125][6];
 
@@ -67,10 +68,14 @@ double average_density(double height, double interval){
   double i;
   double area = 0;
   double step = 0.25; //decreasing this number will increase run time and accuracy
+  clock_t begin = clock();
   if(height <= 100000){
     for (i=height; i<(height+interval); i+=step){
       area += ((density(i) + density(i + step)) / 2) * step;
     }
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("Integrated in: %f\n", time_spent);
     return area / interval;
   }
   else{
@@ -133,7 +138,7 @@ double before_after(double start_height, double end_height){
   }
 
   for (i=0; i<125; i++){
-    fprintf(f, "%d, %d, %d\n", photons[i][0], photons[i][2], photons[i][3]);
+    fprintf(f, "%d,%d,%d\n", photons[i][0], photons[i][2], photons[i][3]);
   }
   fclose(f);
 }
@@ -156,6 +161,7 @@ int main(){
 
   surface_evolution(start_height, interval);
   //before_after(start_height, end_height);
+  //printf("%f", get_attcoe(125));
 
 
   return 0;
