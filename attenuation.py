@@ -327,7 +327,7 @@ root = Tk()
 root.title('X-Ray Attenuation')
 
 #Title
-l0 = Label(root, font=",18", text="X-Ray Atteunation Model Throught the Upper Atmosphere\n")
+l0 = Label(root, font=",18", text="X-Ray Atteunation Through the Upper Atmosphere\n")
 l0.pack()
 
 #Detonatiol Altitude Entry Widget + label
@@ -351,7 +351,7 @@ button0.pack()
 #Decay Factor Entry Widget + label
 e3 = Entry(root, width=30, borderwidth=3)
 e3.insert(0, "0.99")
-l3 = Label(root, text="Enter Exponetial Decay Factor\n(this determines the shape of the initial photon distribtion)")
+l3 = Label(root, text="Enter Exponential Decay Factor\n(this determines the shape of the initial photon distribution)")
 l3.pack()
 e3.pack()
 
@@ -363,7 +363,7 @@ button1.pack()
 button2 = Button(root, text="Surface Plot of X-Ray Attenuation", width=30, padx=2, pady=5, command=surface_evolution)
 button2.pack()
 
-l4 = Label(text="\nUse the canvas below to draw a custome graph\nand see how the distribution will change with atteuation.\nYou may use the graph as either the initial or\nfinal distribution in the simulation.\n The x-axis is photon energy in keV and the y-axis is photon intesity")
+l4 = Label(text="\nUse the canvas below to draw a custom graph\nand see how the distribution will change with attenuation.\nYou may use the graph as either the initial or\nfinal distribution in the simulation.\n The x-axis is photon energy in keV and the y-axis is photon intensity")
 l4.pack()
 
 #add canvas
@@ -378,7 +378,7 @@ button3 = Button(root, text="Clear Graph", command=clear_canvas)
 button3.pack()
 
 #Plot as inital button
-button4 = Button(root, text="Use Graph as Inital Distribution", width=30, padx=2, pady=5, command=forwards)
+button4 = Button(root, text="Use Graph as Initial Distribution", width=30, padx=2, pady=5, command=forwards)
 button4.pack()
 
 #Plot as final button
