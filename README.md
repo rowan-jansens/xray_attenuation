@@ -8,7 +8,7 @@ mpl_toolkits
 numpy
 Code can be run using:
 $python3 attenuation.py
-## Using the GUI
+## Using the GUI:
 In the GUI the user may specify several parameters to be simulated such as detonation altitude, sensor altitude, and the rate of exponential decay used to generate an initial photon distribution for simulation. The program assumes the density of the atmosphere to be 0 (no attenuation) at all heights above 100,000m.  For this reason, entering a sensor altitude higher than 100,000m will return the same result but will take more time to execute. 
 
 After tweaking the inputs as desired, the user has the option to plot various different experiments such as a line plot of the attenuation transmission percentage across all energies, a line plot of the distribution before and after attenuation, or a surface plot showing the evolution of the distribution as it propagates through the atmosphere.
