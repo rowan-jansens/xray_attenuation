@@ -3,9 +3,10 @@
 Nuclear Explosions release a wide spectrum of EM radiation with a considerable amount in the x-ray region.  As this radiation propagates through the atmosphere, the rays are attenuated at different rates based on their energy.  Modeling how a distribution will evolve as it propagates can be useful to better understand the signatures of a nuclear weapon and aid in their detection.
 ## Running the Code:
 Required packages:
-matplotlib
-mpl_toolkits
+matplotlib,
+mpl_toolkits,
 numpy
+
 Code can be run using:
 $python3 attenuation.py
 ## Using the GUI:
